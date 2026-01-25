@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-
+return()
 add_library(pixlib SHARED IMPORTED GLOBAL)
 set_property(TARGET pixlib PROPERTY IMPORTED_IMPLIB ${CMAKE_CURRENT_SOURCE_DIR}/bin/${CMAKE_GENERATOR_PLATFORM}/WinPixEventRuntime.lib)
 
@@ -54,8 +54,8 @@ function(copyTargetCommand list dest returned_target_name)
         list(APPEND dest_list ${dest}/${file})
     endforeach()
 
-    add_custom_target(${returned_target_name} DEPENDS "${dest_list}")
-    set_target_properties(${returned_target_name} PROPERTIES FOLDER CopyTargets)
+    # add_custom_target(${returned_target_name} DEPENDS "${dest_list}")
+    # set_target_properties(${returned_target_name} PROPERTIES FOLDER CopyTargets)
 endfunction()
 
 copyTargetCommand("${winpixevent_binary}" ${FFX_BIN_PATH} copied_winpixevent_bin)

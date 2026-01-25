@@ -22,9 +22,16 @@
 
 cmake_minimum_required(VERSION 3.23)
 
-if (NOT DEFINED BUILD_TYPE)
-    message(FATAL_ERROR "No BUILD_TYPE specified!)")
-endif()
+# if (NOT DEFINED BUILD_TYPE)
+#     message(FATAL_ERROR "No BUILD_TYPE specified!)")
+# endif()
+
+set(FFX_FSR ON)
+set(FFX_FSR1 ON)
+set(FFX_DENOISER ON)
+set(BUILD_TYPE SAMPLES_DX12)
+set(FFX_PLATFORM_NAME ${CMAKE_GENERATOR_PLATFORM})
+set(FFX_API_BACKEND "DX12_X64")
 
 if( BUILD_TYPE STREQUAL CAULDRON)
 	# Standalone cauldron builds VK and DX12
@@ -99,6 +106,14 @@ if (RUNTIME_SHADER_RECOMPILE EQUAL 1)
 endif()
 
 # Import backend libs
+# Build all other effect samples
+# Build ffx-api from source so samples can link to the source target instead of prebuilt IMPORTED libs
+add_subdirectory(ffx-api)
+if (TARGET ffx_backend_dx12_${CMAKE_GENERATOR_PLATFORM})
+	add_library(ffx_backend_native ALIAS ffx_backend_dx12_${CMAKE_GENERATOR_PLATFORM})
+elseif (TARGET ffx_backend_vk_${CMAKE_GENERATOR_PLATFORM})
+	add_library(ffx_backend_native ALIAS ffx_backend_vk_${CMAKE_GENERATOR_PLATFORM})
+else()
 add_library(ffx_backend_native STATIC IMPORTED)
 set_target_properties(ffx_backend_native PROPERTIES
 					  IMPORTED_CONFIGURATIONS "DebugDX12;DebugVK;RelWithDebInfoDX12;RelWithDebInfoVK;ReleaseDX12;ReleaseVK"
@@ -108,6 +123,7 @@ set_target_properties(ffx_backend_native PROPERTIES
 					  IMPORTED_LOCATION_DEBUGVK "${SDK_ROOT}/bin/ffx_sdk/ffx_backend_vk_${CMAKE_GENERATOR_PLATFORM}d.lib"
 					  IMPORTED_LOCATION_RELEASEVK "${SDK_ROOT}/bin/ffx_sdk/ffx_backend_vk_${CMAKE_GENERATOR_PLATFORM}.lib"
 					  IMPORTED_LOCATION_RELWITHDEBINFOVK "${SDK_ROOT}/bin/ffx_sdk/ffx_backend_vk_${CMAKE_GENERATOR_PLATFORM}drel.lib")
+endif()
 
 if (FFX_BUILD_AS_DLL)
     file(GLOB SDK_DLLS "${SDK_ROOT}/bin/ffx_sdk/*.dll")

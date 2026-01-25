@@ -231,6 +231,43 @@ else()
 	project (FidelityFX-SDK)
 endif()
 
+# Configuration setup
+if (CMAKE_GENERATOR_PLATFORM STREQUAL x64 OR
+	CMAKE_GENERATOR_PLATFORM STREQUAL ARM64 OR
+	CMAKE_GENERATOR_PLATFORM STREQUAL ARM64EC)
+    message(STATUS "Creating sample configs ...")
+	set(CMAKE_CONFIGURATION_TYPES "")
+	if (CAULDRON_DX12)
+		createConfig(DX12 DebugDX12 DEBUG)
+		createConfig(DX12 RelWithDebInfoDX12 RELWITHDEBINFO)
+		createConfig(DX12 ReleaseDX12 RELEASE)
+		list(APPEND CMAKE_CONFIGURATION_TYPES "DebugDX12;RelWithDebInfoDX12;ReleaseDX12;")
+	endif()
+
+	if (CAULDRON_VK)
+		createConfig(VK DebugVK DEBUG)
+		createConfig(VK RelWithDebInfoVK RELWITHDEBINFO)
+		createConfig(VK ReleaseVK RELEASE)
+		list(APPEND CMAKE_CONFIGURATION_TYPES "DebugVK;RelWithDebInfoVK;ReleaseVK;")
+	endif()
+
+    message(STATUS "Generated with config types: ${CMAKE_CONFIGURATION_TYPES}")
+
+    # Set compile definitions as well
+    set_property(DIRECTORY APPEND PROPERTY COMPILE_DEFINITIONS
+        $<$<CONFIG:DebugDX12>:_DX12 _WIN>
+        $<$<CONFIG:DebugVK>:_VK _WIN>
+        $<$<CONFIG:RelWithDebInfoDX12>:_DX12 _WIN _RELEASE _RELEASEWDEBUG>
+        $<$<CONFIG:RelWithDebInfoVK>:_VK _WIN _RELEASE _RELEASEWDEBUG>
+        $<$<CONFIG:ReleaseDX12>:_DX12 _WIN _RELEASE>
+        $<$<CONFIG:ReleaseVK>:_VK _WIN _RELEASE>
+        NOMINMAX
+    )
+
+else()
+    message(FATAL_ERROR "Requested architecture ${CMAKE_GENERATOR_PLATFORM} not yet supported!)")
+endif()
+
 # Components
 add_subdirectory(${FFX_COMPONENTS_PATH}/opticalflow)
 add_subdirectory(${FFX_COMPONENTS_PATH}/frameinterpolation)

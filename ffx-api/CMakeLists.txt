@@ -45,7 +45,17 @@ if (MSVC)
     set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} /W3")
 endif()
 
-set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo)
+## When ffx-api is built standalone, it needs default configuration types.
+## But when included into the top-level SDK project the top-level CMake
+## intentionally creates custom configs (e.g. DebugDX12, DebugVK, ...).
+## Guard the set() so we don't overwrite those top-level configuration names
+## when `ffx-api` is added via add_subdirectory().
+if (NOT DEFINED CMAKE_CONFIGURATION_TYPES)
+	set(CMAKE_CONFIGURATION_TYPES Debug Release RelWithDebInfo)
+endif()
+
+# Postfixes for standalone builds. It's harmless to set them here even when
+# part of the top-level project, so keep them.
 set(CMAKE_DEBUG_POSTFIX d)
 set(CMAKE_RELWITHDEBINFO_POSTFIX drel)
 
@@ -110,7 +120,7 @@ if (FFX_API_BACKEND STREQUAL DX12_X64 OR
 		${CMAKE_CURRENT_SOURCE_DIR}/include/ffx_api/dx12/*.hpp)
 endif()
 
-add_library(amd_fidelityfx_${FFX_PLATFORM_NAME} SHARED ${private_ffx_api} ${private_ffx_api_backend_dx12} ${private_ffx_api_backend_vk} ${public_ffx_api} ${public_ffx_api_backend_dx12} ${public_ffx_api_backend_vk})
+add_library(amd_fidelityfx_${FFX_PLATFORM_NAME} STATIC ${private_ffx_api} ${private_ffx_api_backend_dx12} ${private_ffx_api_backend_vk} ${public_ffx_api} ${public_ffx_api_backend_dx12} ${public_ffx_api_backend_vk})
 
 source_group("private_source" FILES ${private_ffx_api})
 source_group("public_source"  FILES ${public_ffx_api})
@@ -141,10 +151,10 @@ set(FFX_AUTO_COMPILE_SHADERS ON)
 set(FFX_BUILD_AS_DLL OFF)
 add_subdirectory(../sdk sdk)
 
-target_link_libraries(amd_fidelityfx_${FFX_PLATFORM_NAME} PRIVATE ffx_fsr2_${CMAKE_GENERATOR_PLATFORM} ffx_fsr3upscaler_${CMAKE_GENERATOR_PLATFORM} ffx_opticalflow_${CMAKE_GENERATOR_PLATFORM} ffx_frameinterpolation_${CMAKE_GENERATOR_PLATFORM} DXGI)
+target_link_libraries(amd_fidelityfx_${FFX_PLATFORM_NAME} PUBLIC ffx_fsr2_${CMAKE_GENERATOR_PLATFORM} ffx_fsr3upscaler_${CMAKE_GENERATOR_PLATFORM} ffx_opticalflow_${CMAKE_GENERATOR_PLATFORM} ffx_frameinterpolation_${CMAKE_GENERATOR_PLATFORM} DXGI)
 if (FFX_API_BACKEND STREQUAL VK_X64)
 	find_package(Vulkan REQUIRED)
-	target_link_libraries(amd_fidelityfx_${FFX_PLATFORM_NAME} PRIVATE Vulkan::Headers ffx_backend_vk_${CMAKE_GENERATOR_PLATFORM})
+	target_link_libraries(amd_fidelityfx_${FFX_PLATFORM_NAME} PUBLIC Vulkan::Headers ffx_backend_vk_${CMAKE_GENERATOR_PLATFORM})
 else() # DX12
-	target_link_libraries(amd_fidelityfx_${FFX_PLATFORM_NAME} PRIVATE D3D12 ffx_backend_dx12_${CMAKE_GENERATOR_PLATFORM})
+	target_link_libraries(amd_fidelityfx_${FFX_PLATFORM_NAME} PUBLIC D3D12 ffx_backend_dx12_${CMAKE_GENERATOR_PLATFORM})
 endif()

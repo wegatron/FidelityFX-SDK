@@ -27,22 +27,31 @@ project(FFX_API_FSR)
 # Fidelity FX Api FSR Sample
 # ---------------------------------------------
 
-# Import SDK libs
-add_library(amd_fidelityfx SHARED IMPORTED)
-set_target_properties(amd_fidelityfx PROPERTIES
-					  INTERFACE_INCLUDE_DIRECTORIES 		"${API_ROOT}/include"
-					  IMPORTED_LOCATION_RELEASEDX12 		"${FFX_API_PATHNAME_DX12}.dll"
-					  IMPORTED_LOCATION_RELWITHDEBINFODX12 	"${FFX_API_PATHNAME_DX12DREL}.dll"
-					  IMPORTED_LOCATION_DEBUGDX12 			"${FFX_API_PATHNAME_DX12D}.dll"
-					  IMPORTED_LOCATION_RELEASEVK 			"${FFX_API_PATHNAME_VK}.dll"
-					  IMPORTED_LOCATION_RELWITHDEBINFOVK 	"${FFX_API_PATHNAME_VKDREL}.dll"
-					  IMPORTED_LOCATION_DEBUGVK 			"${FFX_API_PATHNAME_VKD}.dll"
-					  IMPORTED_IMPLIB_RELEASEDX12 			"${FFX_API_PATHNAME_DX12}.lib"
-					  IMPORTED_IMPLIB_RELWITHDEBINFODX12 	"${FFX_API_PATHNAME_DX12DREL}.lib"
-					  IMPORTED_IMPLIB_DEBUGDX12 			"${FFX_API_PATHNAME_DX12D}.lib"
-					  IMPORTED_IMPLIB_RELEASEVK 			"${FFX_API_PATHNAME_VK}.lib"
-					  IMPORTED_IMPLIB_RELWITHDEBINFOVK 		"${FFX_API_PATHNAME_VKDREL}.lib"
-					  IMPORTED_IMPLIB_DEBUGVK 				"${FFX_API_PATHNAME_VKD}.lib")
+# Prefer using the source-built ffx-api library if it's available (amd_fidelityfx_dx12 / amd_fidelityfx_vk).
+# If those targets are present (built via the top-level/ffx-api CMake), create an alias `amd_fidelityfx` to them.
+# Otherwise fall back to the historical behaviour of creating an IMPORTED target that points at prebuilt DLL/.lib files.
+if (TARGET amd_fidelityfx_dx12)
+	add_library(amd_fidelityfx ALIAS amd_fidelityfx_dx12)
+elseif (TARGET amd_fidelityfx_vk)
+	add_library(amd_fidelityfx ALIAS amd_fidelityfx_vk)
+else()
+	# Import SDK libs (fallback to prebuilt binaries)
+	add_library(amd_fidelityfx SHARED IMPORTED)
+	set_target_properties(amd_fidelityfx PROPERTIES
+						  INTERFACE_INCLUDE_DIRECTORIES 	"${API_ROOT}/include"
+						  IMPORTED_LOCATION_RELEASEDX12 		"${FFX_API_PATHNAME_DX12}.dll"
+						  IMPORTED_LOCATION_RELWITHDEBINFODX12 	"${FFX_API_PATHNAME_DX12DREL}.dll"
+						  IMPORTED_LOCATION_DEBUGDX12 		"${FFX_API_PATHNAME_DX12D}.dll"
+						  IMPORTED_LOCATION_RELEASEVK 		"${FFX_API_PATHNAME_VK}.dll"
+						  IMPORTED_LOCATION_RELWITHDEBINFOVK 	"${FFX_API_PATHNAME_VKDREL}.dll"
+						  IMPORTED_LOCATION_DEBUGVK 		"${FFX_API_PATHNAME_VKD}.dll"
+						  IMPORTED_IMPLIB_RELEASEDX12 		"${FFX_API_PATHNAME_DX12}.lib"
+						  IMPORTED_IMPLIB_RELWITHDEBINFODX12 	"${FFX_API_PATHNAME_DX12DREL}.lib"
+						  IMPORTED_IMPLIB_DEBUGDX12 		"${FFX_API_PATHNAME_DX12D}.lib"
+						  IMPORTED_IMPLIB_RELEASEVK 		"${FFX_API_PATHNAME_VK}.lib"
+						  IMPORTED_IMPLIB_RELWITHDEBINFOVK 	"${FFX_API_PATHNAME_VKDREL}.lib"
+						  IMPORTED_IMPLIB_DEBUGVK 		"${FFX_API_PATHNAME_VKD}.lib")
+endif()
 
 # FSR render module files
 set(fsr_api_src ${CMAKE_CURRENT_SOURCE_DIR}/fsrapirendermodule.h ${CMAKE_CURRENT_SOURCE_DIR}/fsrapirendermodule.cpp)
