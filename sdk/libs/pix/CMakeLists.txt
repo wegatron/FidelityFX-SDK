@@ -48,7 +48,7 @@ function(copyTargetCommand list dest returned_target_name)
             PRE_BUILD
             COMMAND ${CMAKE_COMMAND} -E make_directory ${dest}
             COMMAND ${CMAKE_COMMAND} -E copy_if_different ${fullFileName} ${dest}
-            MAIN_DEPENDENCY  ${fullFileName}
+            DEPENDS  ${fullFileName}
             COMMENT "Updating ${file} into ${dest}"
         )
         list(APPEND dest_list ${dest}/${file})
