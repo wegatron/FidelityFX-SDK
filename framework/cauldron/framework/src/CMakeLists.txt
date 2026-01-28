@@ -162,8 +162,8 @@ add_library(Framework STATIC
     ${rendermodules_skinning} ${rendermodules_raytracing} ${rendermodules_tonemapping} ${rendermodules_fpslimiter}
     ${rendermodules_runtimeshaderrecompiler} ${shaderfiles} ${fidelityfx_common_shaderfiles} ${fidelityfx_spd_shaderfiles}
     ${fidelityfx_parallelsort_shaderfiles}
-    $<$<OR:$<CONFIG:DebugVK>,$<CONFIG:ReleaseVK>,$<CONFIG:RelWithDebInfoVK>>: ${miscfiles_vk} ${renderfiles_vk}>
-    $<$<OR:$<CONFIG:DebugDX12>,$<CONFIG:ReleaseDX12>,$<CONFIG:RelWithDebInfoDX12>>: ${miscfiles_dx12} ${renderfiles_dx12}>)
+    # $<$<OR:$<CONFIG:DebugVK>,$<CONFIG:ReleaseVK>,$<CONFIG:RelWithDebInfoVK>>: ${miscfiles_vk} ${renderfiles_vk}>
+    ${miscfiles_dx12} ${renderfiles_dx12}>)
 
 target_compile_definitions(Framework PRIVATE RenderModuleRoot="${RENDERMODULE_ROOT}")
 
@@ -186,15 +186,15 @@ set(corefiles_backend_vk
     ${CMAKE_CURRENT_SOURCE_DIR}/core/backend_implementations/backend_interface_vk.cpp)
 
 add_library(backend_interface_static
-    $<$<OR:$<CONFIG:DebugVK>,$<CONFIG:ReleaseVK>,$<CONFIG:RelWithDebInfoVK>>: ${corefiles_backend_vk}>
-    $<$<OR:$<CONFIG:DebugDX12>,$<CONFIG:ReleaseDX12>,$<CONFIG:RelWithDebInfoDX12>>: ${corefiles_backend_dx12}>)
+    # $<$<OR:$<CONFIG:DebugVK>,$<CONFIG:ReleaseVK>,$<CONFIG:RelWithDebInfoVK>>: ${corefiles_backend_vk}>
+    ${corefiles_backend_dx12}>)
 
 target_include_directories(backend_interface_static PUBLIC ${FFX_HOST_BACKENDS_PATH} ${FFX_INCLUDE_PATH})
 target_compile_definitions(backend_interface_static PRIVATE SUPPORT_RUNTIME_SHADER_RECOMPILE=0)
 
 add_library(backend_interface_dynamic
-    $<$<OR:$<CONFIG:DebugVK>,$<CONFIG:ReleaseVK>,$<CONFIG:RelWithDebInfoVK>>: ${corefiles_backend_vk}>
-    $<$<OR:$<CONFIG:DebugDX12>,$<CONFIG:ReleaseDX12>,$<CONFIG:RelWithDebInfoDX12>>: ${corefiles_backend_dx12}>)
+    # $<$<OR:$<CONFIG:DebugVK>,$<CONFIG:ReleaseVK>,$<CONFIG:RelWithDebInfoVK>>: ${corefiles_backend_vk}>
+    ${corefiles_backend_dx12}>)
 
 target_include_directories(backend_interface_dynamic PUBLIC ${FFX_HOST_BACKENDS_PATH} ${FFX_INCLUDE_PATH})
 target_compile_definitions(backend_interface_dynamic PRIVATE SUPPORT_RUNTIME_SHADER_RECOMPILE=1)

@@ -34,14 +34,14 @@ add_executable(Cauldron WIN32 ${default_icon_src} ${default_entry_point} ${defau
 
 # Link everything (including the compiler for now)
 target_link_libraries(Cauldron LINK_PUBLIC Framework RenderModules d3dcompiler backend_interface_stub)
-set_target_properties(Cauldron PROPERTIES
-					OUTPUT_NAME_DEBUGDX12 "${PROJECT_NAME}DX12D"
-					OUTPUT_NAME_DEBUGVK "${PROJECT_NAME}VKD"
-					OUTPUT_NAME_RELEASEDX12 "${PROJECT_NAME}DX12"
-					OUTPUT_NAME_RELEASEVK "${PROJECT_NAME}VK"
-					OUTPUT_NAME_RELWITHDEBINFODX12 "${PROJECT_NAME}drelDX12"
-					OUTPUT_NAME_RELWITHDEBINFOVK "${PROJECT_NAME}drelVK"
-					VS_DEBUGGER_WORKING_DIRECTORY "${BIN_OUTPUT}")
+# set_target_properties(Cauldron PROPERTIES
+# 					OUTPUT_NAME_DEBUGDX12 "${PROJECT_NAME}DX12D"
+# 					OUTPUT_NAME_DEBUGVK "${PROJECT_NAME}VKD"
+# 					OUTPUT_NAME_RELEASEDX12 "${PROJECT_NAME}DX12"
+# 					OUTPUT_NAME_RELEASEVK "${PROJECT_NAME}VK"
+# 					OUTPUT_NAME_RELWITHDEBINFODX12 "${PROJECT_NAME}drelDX12"
+# 					OUTPUT_NAME_RELWITHDEBINFOVK "${PROJECT_NAME}drelVK"
+# 					VS_DEBUGGER_WORKING_DIRECTORY "${BIN_OUTPUT}")
 
 # Add compile definitions to identify the sample
 target_compile_definitions(Cauldron PRIVATE SampleName=L"Cauldron"
